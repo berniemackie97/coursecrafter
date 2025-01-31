@@ -21,16 +21,16 @@ export default function SignUp() {
   const [password, setPassword] = useState();
 
   const RegisterAccount = () => {
-    createUserWithEmailAndPassword(auth, email, password).then(
-      async (response) => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (response) => {
         const user = response.user;
         console.log(user);
-        await CreateUserRecord(user);
         // Save user to DB
-      }
-    ).catch(error=>{
-      console.log(error.message)
-    })
+        await CreateUserRecord(user);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   };
 
   const CreateUserRecord = async (user) => {

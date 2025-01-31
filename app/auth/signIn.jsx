@@ -1,10 +1,18 @@
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Pressable } from 'react-native'
-import Colors from '@/constants/Colors.jsx'
-import React from 'react'
-import { useRouter } from 'expo-router';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
+import Colors from "@/constants/Colors.jsx";
+import React from "react";
+import { useRouter } from "expo-router";
 
 export default function SignIn() {
-    const router = useRouter();
+  const router = useRouter();
   return (
     <View style={styles.mainView}>
       <Image
@@ -23,9 +31,11 @@ export default function SignIn() {
       </TouchableOpacity>
 
       <View style={styles.subView}>
-        <Text style={{fontFamily: 'outfit'}}>Not signed up yet?</Text>
-        <Pressable onPress={()=>router.push('/auth/signUp')}>
-          <Text style={{color: Colors.PRIMARY, fontFamily: 'outfit-bold'}}>Register Here</Text>
+        <Text style={{ fontFamily: "outfit" }}>Not signed up yet?</Text>
+        <Pressable onPress={() => router.push("/auth/signUp")}>
+          <Text style={{ color: Colors.PRIMARY, fontFamily: "outfit-bold" }}>
+            Register Here
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -44,7 +54,7 @@ const styles = StyleSheet.create({
     fontFamily: "outfit",
     fontSize: 20,
     textAlign: "center",
-    color: Colors.WHITE
+    color: Colors.WHITE,
   },
   logo: {
     width: 180,
@@ -59,10 +69,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.WHITE,
   },
   subView: {
-    display: 'flex',
-    flexDirection: 'row',
+    display: "flex",
+    flexDirection: "row",
     gap: 5,
-    marginTop: 20
+    marginTop: 20,
   },
   header: {
     fontSize: 30,
