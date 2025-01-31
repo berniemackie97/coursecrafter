@@ -1,23 +1,34 @@
 import Colors from "@/constants/Colors.jsx";
 import { useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/config/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserDetailContext } from "@/context/UserDetailContext";
 
 export default function Index() {
   const router = useRouter();
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const [loading, setLoading] = useState(false);
 
   onAuthStateChanged(auth, async (user) => {
+    setLoading(true);
     if (user) {
       console.log(user);
       const result = await getDoc(doc(db, "users", user?.email));
       setUserDetail(result.data());
+      setLoading(false);
       router.replace("/(tabs)/home");
     }
+    setLoading(false);
   });
 
   return (
@@ -27,6 +38,11 @@ export default function Index() {
         backgroundColor: Colors.WHITE,
       }}
     >
+      {loading && (
+        <View style={styles.overlay}>
+          <ActivityIndicator size={80} color={Colors.PRIMARY} />
+        </View>
+      )}
       <Image
         source={require("./../assets/images/landing.png")}
         style={{
@@ -109,5 +125,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontFamily: "outfit",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",  // Semi-transparent overlay
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 100,  // Make sure it's on top of all other elements
   },
 });
