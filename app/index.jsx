@@ -22,7 +22,6 @@ export default function Index() {
   onAuthStateChanged(auth, async (user) => {
     setLoading(true);
     if (user) {
-      console.log(user);
       const result = await getDoc(doc(db, "users", user?.email));
       setUserDetail(result.data());
       setLoading(false);

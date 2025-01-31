@@ -29,14 +29,12 @@ export default function SignIn() {
     signInWithEmailAndPassword(auth, email, password)
       .then(async (response) => {
         const user = response.user;
-        console.log(user);
         await getUserDetail();
         setLoading(false);
         router.replace('/(tabs)/home')
       })
       .catch((error) => {
         setLoading(false);
-        console.log(error);
         ToastAndroid.show(
           "Incorrect Email/Password combination",
           ToastAndroid.BOTTOM
@@ -46,7 +44,6 @@ export default function SignIn() {
 
   const getUserDetail = async () => {
     const result = await getDoc(doc(db, "users", email));
-    console.log(result.data());
     setUserDetail(result.data());
   };
 

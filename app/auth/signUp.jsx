@@ -28,12 +28,10 @@ export default function SignUp() {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (response) => {
         const user = response.user;
-        console.log(user);
         // Save user to DB
         await CreateUserRecord(user);
       })
       .catch((error) => {
-        console.log(error.message);
         let errorMessage = "An error occurred. Please try again.";
 
         // Handle specific Firebase Auth error codes
