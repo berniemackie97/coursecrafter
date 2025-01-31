@@ -6,13 +6,50 @@ import {
   TextInput,
   TouchableOpacity,
   Pressable,
+  ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import Colors from "@/constants/Colors.jsx";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "expo-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../config/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function SignIn() {
   const router = useRouter();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const [loading, setLoading] = useState(false);
+
+  const onSignInClick = () => {
+    setLoading(true);
+    signInWithEmailAndPassword(auth, email, password)
+      .then(async (response) => {
+        const user = response.user;
+        console.log(user);
+        await getUserDetail();
+        setLoading(false);
+        router.replace('/(tabs)/home')
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.log(error);
+        ToastAndroid.show(
+          "Incorrect Email/Password combination",
+          ToastAndroid.BOTTOM
+        );
+      });
+  };
+
+  const getUserDetail = async () => {
+    const result = await getDoc(doc(db, "users", email));
+    console.log(result.data());
+    setUserDetail(result.data());
+  };
+
   return (
     <View style={styles.mainView}>
       <Image
@@ -20,14 +57,31 @@ export default function SignIn() {
         source={require("./../../assets/images/logo.png")}
       />
       <Text style={styles.header}>Welcome Back!</Text>
-      <TextInput placeholder="Email" style={styles.textInput} />
+
+      {/* Inputs */}
+      <TextInput
+        placeholder="Email"
+        onChangeText={(value) => setEmail(value)}
+        style={styles.textInput}
+      />
       <TextInput
         placeholder="Password"
+        onChangeText={(value) => setPassword(value)}
         secureTextEntry={true}
         style={styles.textInput}
       />
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Sign In</Text>
+
+      {/* Buttons */}
+      <TouchableOpacity
+        onPress={onSignInClick}
+        disabled={loading}
+        style={styles.button}
+      >
+        {!loading ? (
+          <Text style={styles.buttonText}>Sign In</Text>
+        ) : (
+          <ActivityIndicator size={"large"} color={Colors.WHITE} />
+        )}
       </TouchableOpacity>
 
       <View style={styles.subView}>

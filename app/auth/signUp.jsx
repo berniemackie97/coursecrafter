@@ -6,19 +6,23 @@ import {
   TextInput,
   TouchableOpacity,
   Pressable,
+  ToastAndroid,
 } from "react-native";
 import Colors from "@/constants/Colors.jsx";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { auth, db } from "../../config/firebaseConfig";
+import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function SignUp() {
   const router = useRouter();
   const [fullName, setFullName] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
   const RegisterAccount = () => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -30,16 +34,45 @@ export default function SignUp() {
       })
       .catch((error) => {
         console.log(error.message);
+        let errorMessage = "An error occurred. Please try again.";
+
+        // Handle specific Firebase Auth error codes
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage = "This email is already in use. Please use a different email.";
+            break;
+          case 'auth/invalid-email':
+            errorMessage = "The email address is not valid. Please enter a valid email.";
+            break;
+          case 'auth/weak-password':
+            errorMessage = "The password is too weak. Please use a stronger password.";
+            break;
+          case 'auth/missing-email':
+            errorMessage = "Please enter an email address.";
+            break;
+          case 'auth/missing-password':
+            errorMessage = "Please enter a password.";
+            break;
+          default:
+            errorMessage = error.message;
+            break;
+        }
+        ToastAndroid.show(errorMessage, ToastAndroid.BOTTOM)
       });
   };
 
   const CreateUserRecord = async (user) => {
-    await setDoc(doc(db, "users", email), {
+    const data = {
       name: fullName,
       email: email,
       member: false,
+      createdDate: Timestamp.fromMillis(Date.now()),
+      lastUpdatedDate: Timestamp.fromMillis(Date.now()),
       uid: user?.uid,
-    });
+    };
+    await setDoc(doc(db, "users", email), data);
+
+    setUserDetail(data);
   };
 
   return (
